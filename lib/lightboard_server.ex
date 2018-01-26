@@ -6,7 +6,7 @@ defmodule LightboardServer do
     """
     def start(_type, _args) do
         children = [
-            Plug.Adapters.Cowboy.child_spec(:http, LightboardServer.BasicPlug, [], port: 8080)
+            Plug.Adapters.Cowboy.child_spec(:http, LightboardServer.Router, [], port: 8080)
         ]
 
         Logger.info("Started application")

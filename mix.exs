@@ -23,7 +23,8 @@ defmodule LightboardServer.Mixfile do
   defp deps do
     [
         {:cowboy, "~> 1.1"},
-        {:plug, "~> 1.4.3"}
+        {:plug, "~> 1.4.3"},
+        {:jason, "~> 1.0.0"}
     ]
   end
 end
