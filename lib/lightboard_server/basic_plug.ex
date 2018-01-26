@@ -6,7 +6,7 @@ defmodule LightboardServer.BasicPlug do
     end
 
     def call(conn, _opts) do
-        conn = conn.put_resp_content_type("text/plain")
-        conn.send_resp(200, "Hello World!\n")
+        conn = put_resp_content_type(conn, "text/plain")
+        conn = send_resp(conn, 200, "Hello World!\n")
     end
 end
