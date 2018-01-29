@@ -2,7 +2,7 @@ defmodule LightboardServer.Router do
     use Plug.Router
     require Logger
 
-    plug(Plug.Parsers, parsers: [:urlencoded, :json], json_decoder: Jason, keys: :atoms)
+    plug(Plug.Parsers, parsers: [:urlencoded, :json], json_decoder: Jason)
 
     plug(:match)
     plug(:dispatch)

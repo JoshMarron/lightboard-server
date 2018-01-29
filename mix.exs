@@ -24,7 +24,8 @@ defmodule LightboardServer.Mixfile do
     [
         {:cowboy, "~> 1.1"},
         {:plug, "~> 1.4.3"},
-        {:jason, "~> 1.0.0"}
+        {:jason, "~> 1.0.0"},
+        {:nerves_uart, "~> 1.0.0"}
     ]
   end
 end
