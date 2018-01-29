@@ -14,8 +14,11 @@ defmodule LightboardServer.Router do
 
     post "/word" do
         Logger.info(inspect conn.body_params)
-        result = WordHandler.sendWord(conn.body_params)
-        send_resp(conn, 200, result)
+        conn = put_resp_content_type(conn, "application/json")
+        case WordHandler.sendWord(conn.body_params["word"]) do
+            {:ok, word} -> send_resp(conn, 200, Jason.encode!(%{result: "success", word: word}))
+            {:error, reason} -> send_resp(conn, 500, Jason.encode!(%{result: "error", reason: reason}))
+        end
     end
 
     post "/grid" do
