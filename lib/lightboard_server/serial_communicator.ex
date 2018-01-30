@@ -48,11 +48,15 @@ defmodule LightboardServer.SerialCommunicator do
     def handle_cast({:send_grid, grid}, state) do
         UART.write(:uart, 'G')
         Enum.each(grid, fn(colour) ->
-            UART.write(:uart, <<colour::16>>)
+            case UART.write(:uart, <<colour::16>>) do
+                :ok ->
+                    nil
+                {:error, reason} ->
+                    Logger.error("Sending failed, restart the serialiser: "<>inspect reason)
+                    raise("Serialising failed")
+            end
             Process.sleep(400)
         end)
         {:noreply, state}
     end
-
-
 end
