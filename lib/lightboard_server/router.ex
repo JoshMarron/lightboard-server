@@ -23,7 +23,7 @@ defmodule LightboardServer.Router do
 
     post "/grid" do
         Logger.info(inspect conn.body_params)
-        result = GridHandler.handleGrid(conn.body_params)
+        result = GridHandler.handleGrid(conn.body_params["grid"])
         if(result, do: send_resp(conn, 200, "Ok"), else: send_resp(conn, 200, "Error"))
     end
 
