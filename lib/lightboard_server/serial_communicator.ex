@@ -3,6 +3,10 @@ defmodule LightboardServer.SerialCommunicator do
     alias Nerves.UART, as: UART
     require Logger
 
+    defmodule SerialError do
+        defexception message: "Serial communication error - consider restarting the Arduino and/or server"
+    end
+
     def start_link([]) do
         GenServer.start_link(__MODULE__, [], name: :serialiser)
     end
@@ -15,8 +19,8 @@ defmodule LightboardServer.SerialCommunicator do
         GenServer.call(:serialiser, {:send_word, word})
     end
 
-    def change_colours do
-        :ok
+    def change_colours(colour_list) do
+        GenServer.call(:serialiser, {:change_colours, colour_list})
     end
 
     # Callbacks
@@ -45,6 +49,25 @@ defmodule LightboardServer.SerialCommunicator do
         end
     end
 
+    def handle_call({:change_colours, colour_list}, from, state) do
+        UART.write(:uart, 'C')
+        try do
+            UART.write(:uart, <<div(length(colour_list), 3)::8>>)
+            Enum.each(colour_list, fn(colour) -> 
+                case UART.write(:uart, <<colour::8>>) do
+                    :ok -> nil
+                    {:error, reason} ->
+                        Logger.error("Sending failed, restart the serialiser or Arduino: "<>inspect reason)
+                        raise SerialError
+                end
+            end)
+            {:reply, {:ok, length(colour_list)}, state}
+        rescue
+            e in SerialError ->
+                {:reply, {:error, e}, state}
+        end
+    end
+
     def handle_cast({:send_grid, grid}, state) do
         UART.write(:uart, 'G')
         Enum.each(grid, fn(colour) ->
@@ -59,4 +82,5 @@ defmodule LightboardServer.SerialCommunicator do
         end)
         {:noreply, state}
     end
+
 end

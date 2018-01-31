@@ -27,5 +27,13 @@ defmodule LightboardServer.Router do
         if(result, do: send_resp(conn, 200, "Ok"), else: send_resp(conn, 200, "Error"))
     end
 
-    match(_, do: send_resp(conn, 404, "Error\n"))
+    post "/colour" do
+        Logger.info(inspect conn.body_params)
+        case ColourHandler.handleColours(conn.body_params["colours"]) do
+            :ok -> send_resp(conn, 200, Jason.encode!(%{result: "success"}))
+            {:error, reason} -> send_resp(conn, 200, Jason.encode!(%{result: "error", reason: reason}))
+        end
+    end
+
+    match(_, do: send_resp(conn, 404, Jason.encode!(%{status: "error", reason: "Incorrect or undefined API endpoint."})))
 end
