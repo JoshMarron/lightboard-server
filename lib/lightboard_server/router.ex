@@ -30,6 +30,14 @@ defmodule LightboardServer.Router do
     post "/colour" do
         Logger.info(inspect conn.body_params)
         case ColourHandler.handleColours(conn.body_params["colours"]) do
+            {:ok, num} -> send_resp(conn, 200, Jason.encode!(%{result: "success", num_sent: div(num, 3)}))
+            {:error, reason} -> send_resp(conn, 200, Jason.encode!(%{result: "error", reason: reason}))
+        end
+    end
+
+    post "/rainbow" do
+        Logger.info("Turning rainbow mode on")
+        case ColourHandler.rainbowOn do
             :ok -> send_resp(conn, 200, Jason.encode!(%{result: "success"}))
             {:error, reason} -> send_resp(conn, 200, Jason.encode!(%{result: "error", reason: reason}))
         end

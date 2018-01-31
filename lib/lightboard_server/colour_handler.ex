@@ -8,4 +8,8 @@ defmodule ColourHandler do
             {:error, "Invalid colour specification - must be a list of length multiple of 3"}
         end
     end
+
+    def rainbowOn do
+        LightboardServer.SerialCommunicator.rainbow_on
+    end
 end

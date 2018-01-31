@@ -23,6 +23,10 @@ defmodule LightboardServer.SerialCommunicator do
         GenServer.call(:serialiser, {:change_colours, colour_list})
     end
 
+    def rainbow_on() do
+        GenServer.call(:serialiser, :rainbow_on)
+    end
+
     # Callbacks
     def init([]) do
         UART.start_link(name: :uart)
@@ -50,6 +54,8 @@ defmodule LightboardServer.SerialCommunicator do
     end
 
     def handle_call({:change_colours, colour_list}, from, state) do
+        # Turn rainbow mode off before sending the signal
+        UART.write(:uart, 'O')
         UART.write(:uart, 'C')
         try do
             UART.write(:uart, <<div(length(colour_list), 3)::8>>)
@@ -81,6 +87,15 @@ defmodule LightboardServer.SerialCommunicator do
             Process.sleep(400)
         end)
         {:noreply, state}
+    end
+
+    def handle_call(:rainbow_on, from, state) do
+        case UART.write(:uart, 'R') do
+            :ok -> {:reply, :ok, state}
+            {:error, reason} ->
+                Logger.error("Couldn't turn rainbow mode on: "<>inspect reason)
+                {:reply, {:error, "Sending failed, restart the arduino or serialiser"}, state}
+        end
     end
 
 end
